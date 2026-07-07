@@ -13,6 +13,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  family: 4,               // Force IPv4 resolution to prevent ENETUNREACH on IPv6-only lookups in Render containers
   connectionTimeout: 5000, // 5 seconds connection timeout
   greetingTimeout: 5000,   // 5 seconds greeting timeout
   socketTimeout: 5000,     // 5 seconds socket inactivity timeout
