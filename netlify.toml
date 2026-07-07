@@ -12,7 +12,7 @@
 # e.g.  VITE_API_URL = https://evote-backend.onrender.com
 [[redirects]]
   from   = "/api/*"
-  to     = "https://evote-backend.onrender.com/api/:splat"
+  to     = "https://evote-5ssz.onrender.com/api/:splat"
   status = 200
   force  = true
 
