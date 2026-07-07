@@ -16,18 +16,22 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:4173',
-  // Production Netlify URL — set FRONTEND_URL in your backend env vars
+  // Hardcoded production Netlify URL (most reliable)
+  'https://bouesti-evote.netlify.app',
+  // Also read from env var in case URL ever changes
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser requests (e.g. curl, Postman) and listed origins
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS: origin '${origin}' not allowed`));
-    }
+    // Allow requests with no origin (curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow any *.netlify.app subdomain (covers preview deploys too)
+    if (origin.endsWith('.netlify.app')) return callback(null, true);
+    // Allow any explicitly listed origin
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Block everything else
+    callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   credentials: true,
 }));
