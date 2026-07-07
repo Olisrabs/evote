@@ -16,6 +16,9 @@ export const sendOtpEmail = async (to, studentName, otp) => {
     throw new Error('BREVO_API_KEY environment variable is not defined.');
   }
 
+  // Safe check to see what Render is actually loading
+  console.log(`[Brevo Debug] API Key length: ${apiKey.length}, Prefix: ${apiKey.substring(0, 10)}...`);
+
   const response = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
