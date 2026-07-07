@@ -16,16 +16,10 @@ services:
         generateValue: true
       - key: FRONTEND_URL
         sync: false   # set to your Netlify URL, e.g. https://evote.netlify.app
-      - key: SMTP_HOST
-        sync: false   # e.g. smtp.gmail.com
-      - key: SMTP_PORT
-        value: "587"
-      - key: SMTP_SECURE
-        value: "false"
-      - key: SMTP_USER
-        sync: false   # your sending email address
-      - key: SMTP_PASS
-        sync: false   # your app password
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
       - key: SCHOOL_NAME
         sync: false
       - key: COMMISSION_CODE
