@@ -51,7 +51,14 @@ router.post('/request-otp', async (req, res) => {
   });
 
   // Send OTP email
-  await sendOtpEmail(student.email, student.fullName, otp);
+  try {
+    await sendOtpEmail(student.email, student.fullName, otp);
+  } catch (emailError) {
+    console.error('[OTP Email Error]', emailError);
+    return res.status(500).json({
+      message: `Could not send verification email: ${emailError.message || 'Unknown email error'}`
+    });
+  }
 
   return res.status(200).json({ message: 'Verification code sent to your email.' });
 });
