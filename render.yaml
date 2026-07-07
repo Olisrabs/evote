@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: evote-backend
+    runtime: node
+    rootDir: evote-backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: node src/app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false   # set manually in Render dashboard
+      - key: DIRECT_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false   # set to your Netlify URL, e.g. https://evote.netlify.app
+      - key: SMTP_HOST
+        sync: false   # e.g. smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        sync: false   # your sending email address
+      - key: SMTP_PASS
+        sync: false   # your app password
+      - key: SCHOOL_NAME
+        sync: false
+      - key: COMMISSION_CODE
+        sync: false

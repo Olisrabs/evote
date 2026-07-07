@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+model EligibleVoter {
+  id              String   @id @default(uuid())
+  matricNo        String   @unique @map("matric_no")
+  fullName        String   @map("full_name")
+  email           String
+  faculty         String
+  department      String
+  level           String
+  status          String   @default("active")
+  activeSessionId String?  @map("active_session_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  votes           Vote[]
+
+  @@map("eligible_voters")
+}
+
+model OtpToken {
+  id        String   @id @default(uuid())
+  matricNo  String   @map("matric_no")
+  token     String
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("otp_tokens")
+}
+
+model Election {
+  id            String      @id @default(uuid())
+  title         String
+  description   String?
+  electionType  String      @map("election_type")
+  scopeType     String?     @map("scope_type")
+  scopeValue    String?     @map("scope_value")
+  status        String      @default("draft")
+  startsAt      DateTime?   @map("starts_at")
+  endsAt        DateTime?   @map("ends_at")
+  createdBy     String      @map("created_by")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  candidates    Candidate[]
+  votes         Vote[]
+
+  @@map("voting_elections")
+}
+
+model Candidate {
+  id             String   @id @default(uuid())
+  electionId     String   @map("election_id")
+  studentId      String   @map("student_id")
+  fullName       String   @map("full_name")
+  position       String
+  manifesto      String?
+  manifestoSummary String?  @map("manifesto_summary")
+  photoUrl       String?  @map("photo_url")
+  isDisqualified Boolean  @default(false) @map("is_disqualified")
+  createdAt      DateTime @default(now()) @map("created_at")
+  election       Election  @relation(fields: [electionId], references: [id])
+  votes          Vote[]
+
+  @@map("voting_candidates")
+}
+
+model Vote {
+  id            String   @id @default(uuid())
+  electionId    String   @map("election_id")
+  candidateId   String   @map("candidate_id")
+  voterMatricNo String   @map("voter_matric_no")
+  position      String
+  votedAt       DateTime @default(now()) @map("voted_at")
+  election      Election      @relation(fields: [electionId], references: [id])
+  candidate     Candidate     @relation(fields: [candidateId], references: [id])
+  voter         EligibleVoter @relation(fields: [voterMatricNo], references: [matricNo])
+
+  @@unique([electionId, voterMatricNo, position])
+  @@map("voting_votes")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  matricNo  String   @unique @map("matric_no")
+  fullName  String   @map("full_name")
+  role      String   @default("returning_officer")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("voting_admins")
+}

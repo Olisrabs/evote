@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+evote-backend/node_modules/
+
+# Build output
+dist/
+evote-backend/dist/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.production
+evote-backend/.env
+evote-backend/.env.local
+evote-backend/.env.production
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
