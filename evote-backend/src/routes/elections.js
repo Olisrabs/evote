@@ -1,6 +1,7 @@
 import express from 'express';
 import prisma from '../config/database.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { normalizePosition } from '../utils/position.js';
 
 const router = express.Router();
 
@@ -144,12 +145,17 @@ router.post('/:id/vote', async (req, res) => {
     return res.status(403).json({ message: 'This election is closed. Voting time has passed.' });
   }
 
+  const normalizedVotes = votes.map((v) => ({
+    position: normalizePosition(v.position),
+    candidateId: v.candidateId,
+  }));
+
   // Check for already-voted positions to prevent double-voting
   const alreadyVoted = await prisma.vote.findMany({
     where: {
       electionId: req.params.id,
       voterMatricNo: matricNo,
-      position: { in: votes.map((v) => v.position) },
+      position: { in: normalizedVotes.map((v) => v.position) },
     },
   });
 
@@ -162,7 +168,7 @@ router.post('/:id/vote', async (req, res) => {
 
   // Record each vote
   await prisma.vote.createMany({
-    data: votes.map((v) => ({
+    data: normalizedVotes.map((v) => ({
       electionId: req.params.id,
       candidateId: v.candidateId,
       voterMatricNo: matricNo,
@@ -194,7 +200,7 @@ router.get('/:id/results', async (req, res) => {
       const voteCount = await prisma.vote.count({
         where: { candidateId: candidate.id },
       });
-      return { ...candidate, voteCount };
+      return { ...candidate, position: normalizePosition(candidate.position), voteCount };
     })
   );
 

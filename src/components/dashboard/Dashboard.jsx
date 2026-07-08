@@ -5,6 +5,14 @@ const Dashboard = ({ user, onNavigate, onLogout, onSelectElection }) => {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const loadElections = async () => {
@@ -27,8 +35,18 @@ const Dashboard = ({ user, onNavigate, onLogout, onSelectElection }) => {
   }, [onLogout]);
 
   const getClosesIn = (endsAt) => {
-    const diffMs = new Date(endsAt) - new Date();
+    const diffMs = new Date(endsAt) - now;
     if (diffMs <= 0) return 'Closed';
+    
+    // 1 hour or less
+    if (diffMs <= 3600000) {
+      const totalSecs = Math.floor(diffMs / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+      return `Closes in ${hours}h ${mins}m ${secs}s`;
+    }
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);

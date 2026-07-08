@@ -50,6 +50,9 @@ function App() {
     if (!saved) return null;
     try { return JSON.parse(saved); } catch { return null; }
   });
+  const [previousPage, setPreviousPage] = useState(() => {
+    return localStorage.getItem('previousPage') || null;
+  });
   const [selections, setSelections] = useState(() => {
     const saved = localStorage.getItem('selections');
     return saved ? JSON.parse(saved) : {};
@@ -86,7 +89,7 @@ function App() {
 
   useEffect(() => { localStorage.setItem('selections', JSON.stringify(selections)); }, [selections]);
 
-  // Inactivity timeout: 15 minutes (15 * 60 * 1000 ms)
+  // Inactivity timeout: 20 minutes (20 * 60 * 1000 ms)
   useEffect(() => {
     if (!user && !adminUser) return;
 
@@ -95,9 +98,9 @@ function App() {
     const resetTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        alert('You have been logged out due to 15 minutes of inactivity.');
+        alert('You have been logged out due to 20 minutes of inactivity.');
         handleLogout();
-      }, 15 * 60 * 1000); // 15 minutes
+      }, 20 * 60 * 1000); // 20 minutes
     };
 
     // Track user activity events
@@ -179,6 +182,10 @@ function App() {
       window.history.pushState({}, '', '/');
     }
     
+    if (currentPage !== targetPage) {
+      setPreviousPage(currentPage);
+      localStorage.setItem('previousPage', currentPage);
+    }
     setCurrentPage(targetPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -257,6 +264,7 @@ function App() {
         user={user} 
         onNavigate={handleNavigate} 
         candidate={selectedCandidateProfile}
+        previousPage={previousPage}
       />
     );
   }

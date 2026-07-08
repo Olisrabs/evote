@@ -204,7 +204,7 @@ const CandidateProfile = ({ user, onNavigate }) => {
                 <img 
                   alt="Dr. Sarah Chen Portrait" 
                   className="w-full h-full object-cover" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTwB-AbEiUo6oExM1C5MdY8ix9G0YU74V7d7FFoukri397jFLVUZxJ6qym_yOkQr1mMsciO_ADeoZQVmWvCP48LYAkYYrdFqBLzlR3BxQpDUGX_5WBBzG_8oY8ZnxtY9lnBoz1Ue6krmz3uBDeYt6vBTI2vMrYZkwQMYqRBllaBDJ3VKWp5UMaa5SKSmoqQca8gqtzsCXGsfKbJtfo2s_krvwKw3-jmY4dYdq2C7g0jCjumx5xS32Uf1bMwL5MHFlZE3UkK2EZIshT"
+                  src="/images.jpg"
                 />
               </div>
               <div className="absolute bottom-2 right-2 bg-secondary text-white rounded-full p-1.5 shadow-lg ring-2 ring-white hover:scale-110 transition-transform">

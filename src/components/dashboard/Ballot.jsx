@@ -1,28 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 
 const Ballot = ({ user, election, selections, onNavigate, onSelectCandidate, onSelectCandidateProfile }) => {
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Group candidates from the election by position
   const positionsMap = {};
   if (election && Array.isArray(election.candidates)) {
     election.candidates.forEach(c => {
-      if (!positionsMap[c.position]) {
-        positionsMap[c.position] = {
-          id: c.position,
-          title: c.position,
-          description: `Please select one candidate for the position of ${c.position}.`,
+      const normalizedPosition = c.position
+        ? c.position.trim().replace(/\s+/g, ' ').toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+        : '';
+      if (!positionsMap[normalizedPosition]) {
+        positionsMap[normalizedPosition] = {
+          id: normalizedPosition,
+          title: normalizedPosition,
+          description: `Please select one candidate for the position of ${normalizedPosition}.`,
           candidates: []
         };
       }
-      positionsMap[c.position].candidates.push({
+      positionsMap[normalizedPosition].candidates.push({
         id: c.id,
         name: c.fullName,
         party: c.studentId, // We can use student ID / matric no
         description: c.manifestoSummary || (c.manifesto ? c.manifesto.substring(0, 150) : '') || 'No manifesto summary provided.',
         manifesto: c.manifesto || 'No manifesto details provided.',
-        photo: c.photoUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAfanzHlxQeDE6xlggtBFZFNy6hM3HA-tdNN0CZlD5gJIlj960Jhdvu74LEOuyQ5lvtV1GIkQ7pbnxjoopsVe_5wrJn2Dg6cDUzVMlCGuELEFr47CQj0proqr_Lr_668EPzxtgKlMXDeY-7uI-LtMk_-rPWCgqP7prHvVnyfvZ_M3UQ83sRHILXUSdcK9xUx05EzjJxC8tLWVYw8hbrvUhkxMpb0_-3huLvvoctPz4w05E9KwRZ0lK1vjp9po5IKlmGT8ZGyc7Cv536',
+        photo: c.photoUrl || '/images.jpg',
       });
     });
   }
@@ -84,8 +95,18 @@ const Ballot = ({ user, election, selections, onNavigate, onSelectCandidate, onS
   };
 
   const getClosesIn = () => {
-    const diffMs = new Date(election.endsAt) - new Date();
+    const diffMs = new Date(election.endsAt) - now;
     if (diffMs <= 0) return 'Closed';
+    
+    // 1 hour or less
+    if (diffMs <= 3600000) {
+      const totalSecs = Math.floor(diffMs / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+      return `${hours}h ${mins}m ${secs}s remaining`;
+    }
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);

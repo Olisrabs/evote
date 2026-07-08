@@ -4,14 +4,17 @@ const CandidatesList = ({ user, onNavigate, election, onSelectCandidateProfile }
   const candidates = [];
   if (election && Array.isArray(election.candidates)) {
     election.candidates.forEach(c => {
+      const normalizedPosition = c.position
+        ? c.position.trim().replace(/\s+/g, ' ').toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+        : '';
       candidates.push({
         id: c.id,
         name: c.fullName,
-        position: c.position,
+        position: normalizedPosition,
         party: c.studentId,
         description: c.manifestoSummary || (c.manifesto ? c.manifesto.substring(0, 150) : '') || 'No manifesto summary provided.',
         manifesto: c.manifesto || 'No manifesto details provided.',
-        photo: c.photoUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAfanzHlxQeDE6xlggtBFZFNy6hM3HA-tdNN0CZlD5gJIlj960Jhdvu74LEOuyQ5lvtV1GIkQ7pbnxjoopsVe_5wrJn2Dg6cDUzVMlCGuELEFr47CQj0proqr_Lr_668EPzxtgKlMXDeY-7uI-LtMk_-rPWCgqP7prHvVnyfvZ_M3UQ83sRHILXUSdcK9xUx05EzjJxC8tLWVYw8hbrvUhkxMpb0_-3huLvvoctPz4w05E9KwRZ0lK1vjp9po5IKlmGT8ZGyc7Cv536',
+        photo: c.photoUrl || '/images.jpg',
       });
     });
   }

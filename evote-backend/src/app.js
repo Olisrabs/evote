@@ -52,7 +52,7 @@ app.use(session({
     httpOnly: true,
     secure: isProduction,     // HTTPS only in production
     sameSite: isProduction ? 'none' : 'lax', // cross-origin cookies from Netlify
-    maxAge: 1000 * 60 * 15,  // 15 minutes
+    maxAge: 1000 * 60 * 20,  // 20 minutes
   },
 }));
 

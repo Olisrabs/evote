@@ -87,7 +87,7 @@ const PastElectionResults = ({ user, election, onNavigate }) => {
       } : null,
       userVote: userVotedCandidate ? {
         name: userVotedCandidate.fullName,
-        photo: userVotedCandidate.photoUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAfanzHlxQeDE6xlggtBFZFNy6hM3HA-tdNN0CZlD5gJIlj960Jhdvu74LEOuyQ5lvtV1GIkQ7pbnxjoopsVe_5wrJn2Dg6cDUzVMlCGuELEFr47CQj0proqr_Lr_668EPzxtgKlMXDeY-7uI-LtMk_-rPWCgqP7prHvVnyfvZ_M3UQ83sRHILXUSdcK9xUx05EzjJxC8tLWVYw8hbrvUhkxMpb0_-3huLvvoctPz4w05E9KwRZ0lK1vjp9po5IKlmGT8ZGyc7Cv536'
+        photo: userVotedCandidate.photoUrl || '/images.jpg'
       } : null
     };
   });
@@ -214,7 +214,7 @@ const PastElectionResults = ({ user, election, onNavigate }) => {
                               <img 
                                 alt={result.winner.fullName} 
                                 className="w-full h-full object-cover" 
-                                src={result.winner.photoUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAfanzHlxQeDE6xlggtBFZFNy6hM3HA-tdNN0CZlD5gJIlj960Jhdvu74LEOuyQ5lvtV1GIkQ7pbnxjoopsVe_5wrJn2Dg6cDUzVMlCGuELEFr47CQj0proqr_Lr_668EPzxtgKlMXDeY-7uI-LtMk_-rPWCgqP7prHvVnyfvZ_M3UQ83sRHILXUSdcK9xUx05EzjJxC8tLWVYw8hbrvUhkxMpb0_-3huLvvoctPz4w05E9KwRZ0lK1vjp9po5IKlmGT8ZGyc7Cv536'}
+                                src={result.winner.photoUrl || '/images.jpg'}
                               />
                             </div>
                             <div className="flex-grow">

@@ -6,6 +6,14 @@ const ActiveElections = ({ user, onNavigate, onSelectElection }) => {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const loadElections = async () => {
@@ -18,9 +26,9 @@ const ActiveElections = ({ user, onNavigate, onSelectElection }) => {
         if (!r.ok) throw new Error('Failed to load active elections');
         const data = await r.json();
         // Filter out any elections that are expired client-side (belt-and-suspenders)
-        const now = new Date();
+        const nowDate = new Date();
         const live = (data.elections || []).filter(
-          el => !el.endsAt || new Date(el.endsAt) > now
+          el => !el.endsAt || new Date(el.endsAt) > nowDate
         );
         setElections(live);
       } catch (err) {
@@ -36,8 +44,18 @@ const ActiveElections = ({ user, onNavigate, onSelectElection }) => {
   }, [onNavigate]);
 
   const getClosesIn = (endsAtStr) => {
-    const diffMs = new Date(endsAtStr) - new Date();
+    const diffMs = new Date(endsAtStr) - now;
     if (diffMs <= 0) return 'Closed';
+
+    // 1 hour or less
+    if (diffMs <= 3600000) {
+      const totalSecs = Math.floor(diffMs / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+      return `Closing in ${hours}h ${mins}m ${secs}s`;
+    }
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);

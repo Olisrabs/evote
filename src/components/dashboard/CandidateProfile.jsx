@@ -1,8 +1,8 @@
 import DashboardLayout from './DashboardLayout';
 
-const CandidateProfile = ({ user, onNavigate, candidate }) => {
+const CandidateProfile = ({ user, onNavigate, candidate, previousPage }) => {
   const handleBackClick = () => {
-    onNavigate('ballot');
+    onNavigate(previousPage || 'ballot');
   };
 
   if (!candidate) {
@@ -10,16 +10,19 @@ const CandidateProfile = ({ user, onNavigate, candidate }) => {
       <DashboardLayout user={user} onNavigate={onNavigate} activeTab="active-elections">
         <div className="max-w-3xl w-full mx-auto p-md text-center">
           <p className="text-outline mb-4">No candidate selected.</p>
-          <button onClick={handleBackClick} className="text-primary hover:underline font-semibold">Back to Ballot</button>
+          <button onClick={handleBackClick} className="text-primary hover:underline font-semibold">Back</button>
         </div>
       </DashboardLayout>
     );
   }
 
   const name = candidate.name || candidate.fullName || 'Unknown Candidate';
-  const position = candidate.position || 'Candidate';
-  const photo = candidate.photo || candidate.photoUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAfanzHlxQeDE6xlggtBFZFNy6hM3HA-tdNN0CZlD5gJIlj960Jhdvu74LEOuyQ5lvtV1GIkQ7pbnxjoopsVe_5wrJn2Dg6cDUzVMlCGuELEFr47CQj0proqr_Lr_668EPzxtgKlMXDeY-7uI-LtMk_-rPWCgqP7prHvVnyfvZ_M3UQ83sRHILXUSdcK9xUx05EzjJxC8tLWVYw8hbrvUhkxMpb0_-3huLvvoctPz4w05E9KwRZ0lK1vjp9po5IKlmGT8ZGyc7Cv536';
-  const manifesto = candidate.description || candidate.manifesto || 'No manifesto details provided by the candidate.';
+  const position = candidate.position
+    ? candidate.position.trim().replace(/\s+/g, ' ').toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : 'Candidate';
+  const photo = candidate.photo || candidate.photoUrl || '/images.jpg';
+  const manifesto = candidate.manifesto || 'No manifesto details provided by the candidate.';
+  const summary = candidate.description || candidate.manifestoSummary || '';
 
   return (
     <DashboardLayout user={user} onNavigate={onNavigate} activeTab="active-elections">
@@ -31,7 +34,7 @@ const CandidateProfile = ({ user, onNavigate, candidate }) => {
             className="flex items-center space-x-2 text-primary font-label-md hover:underline active:scale-95 transition-transform font-semibold z-10"
           >
             <span className="material-symbols-outlined text-[20px]">arrow_back</span>
-            <span>Back to Ballot</span>
+            <span>Back</span>
           </button>
         </div>
 
@@ -78,7 +81,14 @@ const CandidateProfile = ({ user, onNavigate, candidate }) => {
             <span>Manifesto</span>
           </h3>
           <div className="space-y-4 text-on-surface-variant leading-relaxed font-body-md whitespace-pre-wrap">
-            {manifesto}
+            {summary && (
+              <div className="p-4 bg-primary-container/20 text-on-primary-container-variant rounded-xl border-l-4 border-primary font-medium mb-4 italic">
+                {summary}
+              </div>
+            )}
+            <div>
+              {manifesto}
+            </div>
           </div>
         </section>
       </div>

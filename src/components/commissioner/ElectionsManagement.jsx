@@ -344,23 +344,25 @@ export default function ElectionsManagement({ onNavigate }) {
                   <div><label className="block text-xs font-semibold text-outline mb-1">Full Name *</label><input className={inputClass} value={cForm.fullName} onChange={e => setCForm(p=>({...p,fullName:e.target.value}))} placeholder="John Doe" required /></div>
                   <div><label className="block text-xs font-semibold text-outline mb-1">Position *</label><input className={inputClass} value={cForm.position} onChange={e => setCForm(p=>({...p,position:e.target.value}))} placeholder="e.g. President" required /></div>
                   <div>
-                    <label className="block text-xs font-semibold text-outline mb-1">Manifesto Summary (Max 150 chars)</label>
+                    <label className="block text-xs font-semibold text-outline mb-1">Manifesto Summary (Max 150 chars) *</label>
                     <input 
                       className={inputClass} 
                       value={cForm.manifestoSummary || ''} 
                       onChange={e => setCForm(p=>({...p,manifestoSummary:e.target.value}))} 
                       placeholder="Short candidate summary" 
                       maxLength={150}
+                      required
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-semibold text-outline mb-1">Full Manifesto</label>
+                    <label className="block text-xs font-semibold text-outline mb-1">Full Manifesto *</label>
                     <textarea 
                       className={inputClass} 
                       rows={3}
                       value={cForm.manifesto || ''} 
                       onChange={e => setCForm(p=>({...p,manifesto:e.target.value}))} 
                       placeholder="Detailed candidate manifesto (will only display on candidate profile)" 
+                      required
                     />
                   </div>
                   <div className="col-span-2">

@@ -5,16 +5,22 @@ const VoteReview = ({ user, election, selections, onNavigate, onSubmitBallot }) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const normalizePositionName = (pos) => {
+    return pos
+      ? pos.trim().replace(/\s+/g, ' ').toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      : '';
+  };
+
   const handleSubmit = async () => {
     if (!election) return;
     setIsSubmitting(true);
     setError('');
     try {
-      const validPositions = new Set(election?.candidates?.map(c => c.position) || []);
+      const validPositions = new Set(election?.candidates?.map(c => normalizePositionName(c.position)) || []);
       const votesPayload = Object.entries(selections || {})
-        .filter(([position, candidate]) => validPositions.has(position) && candidate !== null && candidate !== undefined)
+        .filter(([position, candidate]) => validPositions.has(normalizePositionName(position)) && candidate !== null && candidate !== undefined)
         .map(([position, candidate]) => ({
-          position,
+          position: normalizePositionName(position),
           candidateId: typeof candidate === 'object' ? candidate.id : candidate
         }));
 
@@ -38,11 +44,11 @@ const VoteReview = ({ user, election, selections, onNavigate, onSubmitBallot }) 
     }
   };
 
-  const validPositions = new Set(election?.candidates?.map(c => c.position) || []);
+  const validPositions = new Set(election?.candidates?.map(c => normalizePositionName(c.position)) || []);
   const selectedCandidatesList = Object.entries(selections || {})
-    .filter(([position, candidate]) => validPositions.has(position) && candidate !== null && candidate !== undefined)
+    .filter(([position, candidate]) => validPositions.has(normalizePositionName(position)) && candidate !== null && candidate !== undefined)
     .map(([position, candidate]) => ({
-      position,
+      position: normalizePositionName(position),
       name: typeof candidate === 'object' ? (candidate.name || candidate.fullName || 'Unknown Candidate') : 'Unknown Candidate',
       party: typeof candidate === 'object' ? (candidate.party || candidate.studentId || 'N/A') : 'N/A',
       id: typeof candidate === 'object' ? candidate.id : candidate

@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../config/database.js';
+import { normalizePosition } from '../utils/position.js';
 
 const router = express.Router();
 
@@ -124,21 +125,22 @@ router.get('/elections/:id/candidates', async (req, res) => {
 router.post('/elections/:id/candidates', async (req, res) => {
   try {
     const { studentId, fullName, position, manifesto, manifestoSummary, photoUrl } = req.body;
-    if (!studentId || !fullName || !position) {
-      return res.status(400).json({ message: 'Student ID, full name, and position are required.' });
+    if (!studentId || !fullName || !position || !manifesto || !manifestoSummary) {
+      return res.status(400).json({ message: 'Student ID, full name, position, summary, and manifesto details are required.' });
     }
-    if (manifestoSummary && manifestoSummary.length > 150) {
+    if (manifestoSummary.length > 150) {
       return res.status(400).json({ message: 'Candidate summary must not exceed 150 characters.' });
     }
+    const normalizedPosition = normalizePosition(position);
     const candidate = await prisma.candidate.create({
       data: {
         electionId: req.params.id,
         studentId,
         fullName,
-        position,
-        manifesto: manifesto || null,
-        manifestoSummary: manifestoSummary || null,
-        photoUrl: photoUrl || null,
+        position: normalizedPosition,
+        manifesto,
+        manifestoSummary,
+        photoUrl: photoUrl || '/images.jpg',
       },
     });
     return res.status(201).json({ candidate });
@@ -213,12 +215,13 @@ router.get('/elections/:id/results', async (req, res) => {
     // Group by position
     const positionMap = {};
     for (const candidate of election.candidates) {
-      if (!positionMap[candidate.position]) {
-        positionMap[candidate.position] = { position: candidate.position, totalVotes: 0, candidates: [] };
+      const normalizedPos = normalizePosition(candidate.position);
+      if (!positionMap[normalizedPos]) {
+        positionMap[normalizedPos] = { position: normalizedPos, totalVotes: 0, candidates: [] };
       }
       const voteCount = countMap[candidate.id] ?? 0;
-      positionMap[candidate.position].totalVotes += voteCount;
-      positionMap[candidate.position].candidates.push({ ...candidate, voteCount });
+      positionMap[normalizedPos].totalVotes += voteCount;
+      positionMap[normalizedPos].candidates.push({ ...candidate, position: normalizedPos, voteCount });
     }
 
     const results = Object.values(positionMap).map(pos => ({

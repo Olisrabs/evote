@@ -2,36 +2,28 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 
 const LiveResults = ({ user, onNavigate }) => {
-  const [closedElections, setClosedElections] = useState([]);
+  const [activeElectionsList, setActiveElectionsList] = useState([]);
   const [selectedElectionId, setSelectedElectionId] = useState('');
   const [results, setResults] = useState([]);
   const [electionTitle, setElectionTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // 1. Fetch all elections (both active and closed) for live/past results
+  // 1. Fetch only active elections for live results
   useEffect(() => {
     const loadElections = async () => {
       try {
-        const [rActive, rPast] = await Promise.all([
-          fetch('/api/elections', { credentials: 'include' }),
-          fetch('/api/elections/past/all', { credentials: 'include' })
-        ]);
+        const rActive = await fetch('/api/elections', { credentials: 'include' });
 
-        if ((rActive.status === 401 || rPast.status === 401) && onNavigate) {
+        if (rActive.status === 401 && onNavigate) {
           onNavigate('logout');
           return;
         }
 
         const activeData = rActive.ok ? await rActive.json() : { elections: [] };
-        const pastData = rPast.ok ? await rPast.json() : { elections: [] };
+        const list = activeData.elections || [];
 
-        const list = [
-          ...(activeData.elections || []),
-          ...(pastData.elections || [])
-        ];
-
-        setClosedElections(list);
+        setActiveElectionsList(list);
         if (list.length > 0) {
           setSelectedElectionId(list[0].id);
           setElectionTitle(list[0].title);
@@ -72,13 +64,16 @@ const LiveResults = ({ user, onNavigate }) => {
   // Group candidates by position
   const positionsMap = {};
   results.forEach(cand => {
-    if (!positionsMap[cand.position]) {
-      positionsMap[cand.position] = {
-        position: cand.position,
+    const normalizedPosition = cand.position
+      ? cand.position.trim().replace(/\s+/g, ' ').toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      : '';
+    if (!positionsMap[normalizedPosition]) {
+      positionsMap[normalizedPosition] = {
+        position: normalizedPosition,
         candidates: []
       };
     }
-    positionsMap[cand.position].candidates.push(cand);
+    positionsMap[normalizedPosition].candidates.push(cand);
   });
 
   const positionResultsList = Object.values(positionsMap).map(posData => {
@@ -121,14 +116,14 @@ const LiveResults = ({ user, onNavigate }) => {
             Certified historical tallies retrieved dynamically from secure logs.
           </p>
 
-          {closedElections.length > 1 && (
+          {activeElectionsList.length > 1 && (
             <div className="mt-md max-w-xs mx-auto">
               <select
                 value={selectedElectionId}
                 onChange={(e) => setSelectedElectionId(e.target.value)}
                 className="w-full bg-white border border-outline-variant rounded-lg px-3 py-2 font-label-md text-label-md text-on-surface-variant focus:ring-2 focus:ring-primary outline-none"
               >
-                {closedElections.map(el => (
+                {activeElectionsList.map(el => (
                   <option key={el.id} value={el.id}>{el.title}</option>
                 ))}
               </select>
@@ -166,7 +161,7 @@ const LiveResults = ({ user, onNavigate }) => {
                       <div className="flex justify-between items-end mb-2">
                         <div className="flex items-center gap-3">
                           <img 
-                            src={res.photoUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAfanzHlxQeDE6xlggtBFZFNy6hM3HA-tdNN0CZlD5gJIlj960Jhdvu74LEOuyQ5lvtV1GIkQ7pbnxjoopsVe_5wrJn2Dg6cDUzVMlCGuELEFr47CQj0proqr_Lr_668EPzxtgKlMXDeY-7uI-LtMk_-rPWCgqP7prHvVnyfvZ_M3UQ83sRHILXUSdcK9xUx05EzjJxC8tLWVYw8hbrvUhkxMpb0_-3huLvvoctPz4w05E9KwRZ0lK1vjp9po5IKlmGT8ZGyc7Cv536'} 
+                            src={res.photoUrl || '/images.jpg'}  
                             alt={res.fullName} 
                             className="w-10 h-10 rounded-full object-cover border border-outline-variant"
                           />
