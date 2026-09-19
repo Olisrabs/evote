@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 
 const PastElectionResults = ({ user, election, onNavigate }) => {
-  const [copied, setCopied] = useState(false);
+  const [setCopied] = useState(false);
   const [results, setResults] = useState([]);
   const [userVotes, setUserVotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,22 +143,6 @@ const PastElectionResults = ({ user, election, onNavigate }) => {
               <div className="flex items-center gap-xs text-secondary mt-sm font-label-sm font-bold">
                 <span className="material-symbols-outlined text-[16px]">how_to_vote</span>
                 <span>Across all positions</span>
-              </div>
-            </div>
-            
-            <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-center hover:shadow-md transition-shadow">
-              <span className="text-on-surface-variant font-label-md mb-xs font-semibold">Election Audit Hash</span>
-              <div className="flex items-center space-x-2 mt-xs">
-                <code className="text-xs bg-surface-container-high px-2 py-1 rounded truncate max-w-[150px] font-mono text-on-surface">
-                  {election.id}
-                </code>
-                <button 
-                  onClick={handleCopyHash}
-                  className="p-1 hover:bg-surface-container rounded transition-colors text-primary"
-                  title="Copy Audit Hash"
-                >
-                  <span className="material-symbols-outlined text-sm">{copied ? 'check' : 'content_copy'}</span>
-                </button>
               </div>
             </div>
             
